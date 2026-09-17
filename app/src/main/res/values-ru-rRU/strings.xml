@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <!-- App -->
-    <string name="app_name" translatable="false">sing-box</string>
+    <string name="app_name" translatable="false">ISORA VPN</string>
     <string name="app_version_title">Версия приложения</string>
     <string name="language">Язык</string>
     <string name="system_default">Системный по умолчанию</string>
@@ -48,6 +48,9 @@
 
     <!-- Navigation Titles -->
     <string name="title_dashboard">Главная</string>
+    <string name="title_isora_home">Главная</string>
+    <string name="title_isora_servers">Серверы</string>
+    <string name="title_isora_account">Аккаунт</string>
     <string name="title_configuration">Профили</string>
     <string name="title_log">Логи</string>
     <string name="title_settings">Параметры</string>
@@ -594,7 +597,7 @@
     <string name="power_report_enable_description">Записывать статистику процессорного времени, пробуждений и трафика сервиса. Отчёт сохраняется для каждого запуска сервиса.</string>
 
     <!-- Xposed Module -->
-    <string name="xposed_description">Привилегированное расширение для sing-box</string>
+    <string name="xposed_description">Привилегированное расширение для ISORA VPN</string>
 
     <!-- Privileged Enhancement -->
     <string name="privilege_module_title">Привилегированные модули</string>

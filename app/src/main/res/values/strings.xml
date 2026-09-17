@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <!-- App -->
-    <string name="app_name" translatable="false">sing-box</string>
+    <string name="app_name" translatable="false">ISORA VPN</string>
     <string name="app_version_title">App version</string>
     <string name="language">Language</string>
     <string name="system_default">System default</string>
@@ -48,6 +48,9 @@
 
     <!-- Navigation Titles -->
     <string name="title_dashboard">Dashboard</string>
+    <string name="title_isora_home">Home</string>
+    <string name="title_isora_servers">Servers</string>
+    <string name="title_isora_account">Account</string>
     <string name="title_configuration">Profiles</string>
     <string name="title_log">Logs</string>
     <string name="title_settings">Settings</string>
@@ -621,7 +624,7 @@
     <string name="power_report_enable_description">A report is saved for each service run</string>
 
     <!-- Xposed Module -->
-    <string name="xposed_description">Privileged Enhancement for sing-box</string>
+    <string name="xposed_description">Privileged Enhancement for ISORA VPN</string>
 
     <!-- Privileged Enhancement -->
     <string name="privilege_module_title">Privilege modules</string>

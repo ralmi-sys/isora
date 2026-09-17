@@ -9,7 +9,7 @@
             android:name=".vendor.InstallResultReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="io.nekohasekai.sfa.INSTALL_COMPLETE" />
+                <action android:name="net.isora.vpn.INSTALL_COMPLETE" />
             </intent-filter>
         </receiver>
     </application>

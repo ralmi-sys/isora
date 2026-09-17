@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <!-- App -->
-    <string name="app_name" translatable="false">sing-box</string>
+    <string name="app_name" translatable="false">ISORA VPN</string>
     <string name="app_version_title">نسخه برنامه</string>
     <string name="language">زبان</string>
     <string name="system_default">پیش‌فرض سیستم</string>
@@ -588,7 +588,7 @@
     <string name="power_report_enable_description">آمار زمان پردازنده، بیدارسازی و ترافیک سرویس را ثبت می‌کند. برای هر اجرای سرویس یک گزارش ذخیره می‌شود.</string>
 
     <!-- Xposed Module -->
-    <string name="xposed_description">بهبود دسترسی ویژه برای sing-box</string>
+    <string name="xposed_description">بهبود دسترسی ویژه برای ISORA VPN</string>
 
     <!-- Privileged Enhancement -->
     <string name="privilege_module_title">ماژول‌های دسترسی ویژه</string>

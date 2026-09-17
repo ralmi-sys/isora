@@ -58,7 +58,7 @@ fun getVersionProps(propName: String): String {
 }
 
 android {
-    namespace = "io.nekohasekai.sfa"
+    namespace = "net.isora.vpn"
     compileSdk = 37
     compileSdkMinor = 1
 
@@ -72,12 +72,12 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.nekohasekai.sfa"
+        applicationId = "net.isora.vpn"
         minSdk = 24
         targetSdk = 37
         versionCode = getVersionProps("VERSION_CODE").toInt()
         versionName = getVersionProps("VERSION_NAME")
-        base.archivesName.set("SFA-${versionName}")
+        base.archivesName.set("ISORA")
     }
 
     signingConfigs {
@@ -357,6 +357,9 @@ dependencies {
     implementation("sh.calvin.reorderable:reorderable:3.1.0")
     implementation("com.github.jeziellago:compose-markdown:0.7.2")
     implementation("org.kodein.emoji:emoji-kt:2.5.0")
+
+    // ISORA: live duck inside the orb
+    implementation("com.airbnb.android:lottie-compose:6.5.2")
 
     // Terminal emulator
     val libghosttyVersion = "0.1.0-SNAPSHOT"

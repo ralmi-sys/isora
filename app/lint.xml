@@ -6,7 +6,7 @@
       NewApi check based on the app's minSdk does not apply here.
     -->
     <issue id="NewApi">
-        <ignore path="src/main/java/io/nekohasekai/sfa/xposed" />
+        <ignore path="src/main/java/net/isora/vpn/xposed" />
         <ignore path="src/main/java/io/github/libxposed/service" />
     </issue>
 </lint>
