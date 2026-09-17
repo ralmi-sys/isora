@@ -56,7 +56,9 @@ class Application : Application() {
 
         val baseDir = filesDir
         baseDir.mkdirs()
-        val workingDir = getExternalFilesDir(null)
+        // Внешнее хранилище бывает «видимым, но неписуемым» (LDPlayer и т.п.):
+        // путь есть, а запись роняет libbox. Проверяем пробным файлом.
+        val workingDir = writableDir(getExternalFilesDir(null)) ?: baseDir
         val tempDir = cacheDir
         tempDir.mkdirs()
         if (workingDir != null) {
@@ -93,9 +95,21 @@ class Application : Application() {
 
     fun reloadSetupOptions() {
         val baseDir = filesDir
-        val workingDir = getExternalFilesDir(null) ?: return
+        val workingDir = writableDir(getExternalFilesDir(null)) ?: baseDir
         val tempDir = cacheDir
         Libbox.reloadSetupOptions(createSetupOptions(baseDir, workingDir, tempDir))
+    }
+
+    private fun writableDir(dir: File?): File? {
+        if (dir == null) return null
+        return try {
+            dir.mkdirs()
+            val probe = File(dir, ".wtest")
+            if (probe.createNewFile()) probe.delete()
+            if (dir.isDirectory && dir.canWrite()) dir else null
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private fun setupLibbox(baseDir: File, workingDir: File, tempDir: File) {

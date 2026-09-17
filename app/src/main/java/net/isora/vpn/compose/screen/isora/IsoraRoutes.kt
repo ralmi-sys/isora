@@ -1,9 +1,29 @@
 package net.isora.vpn.compose.screen.isora
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import net.isora.vpn.compose.screen.dashboard.DashboardViewModel
 import net.isora.vpn.compose.screen.dashboard.groups.GroupsViewModel
 import net.isora.vpn.compose.screen.isora.ui.components.CountryCode
@@ -59,6 +79,9 @@ fun IsoraHomeRoute(
     onOpenAccount: () -> Unit,
 ) {
     val dash by dashboardViewModel.uiState.collectAsState()
+    LaunchedEffect(serviceStatus) {
+        groupsViewModel?.updateServiceStatus(serviceStatus)
+    }
     val groups = groupsViewModel?.uiState?.collectAsState()?.value
     val selector = groups?.groups?.find { it.tag == ISORA_SELECTOR_TAG }
     val selTag = selector?.selected
@@ -82,14 +105,21 @@ fun IsoraHomeRoute(
             if (hasProfile) dashboardViewModel.toggleService() else onOpenAccount()
         },
         onOpenServers = onOpenServers,
+        upText = dash.uplink,
+        downText = dash.downlink,
     )
 }
 
 @Composable
 fun IsoraServersRoute(
     groupsViewModel: GroupsViewModel?,
+    serviceStatus: Status,
     onSelectDone: () -> Unit,
 ) {
+    // Без статуса команды стоят: клиент групп коннектится только на Started.
+    LaunchedEffect(serviceStatus) {
+        groupsViewModel?.updateServiceStatus(serviceStatus)
+    }
     val groups = groupsViewModel?.uiState?.collectAsState()?.value
     val selector = groups?.groups?.find { it.tag == ISORA_SELECTOR_TAG }
 
@@ -122,8 +152,68 @@ fun IsoraAccountRoute(
     groupsViewModel: GroupsViewModel?,
     serviceStatus: Status,
     onManageSubscription: () -> Unit,
+    onLoggedIn: () -> Unit,
+    onOpenServers: () -> Unit,
 ) {
     val dash by dashboardViewModel.uiState.collectAsState()
+    // Профиля нет — вход через Telegram вместо ручного импорта.
+    if (dash.profiles.isEmpty()) {
+        androidx.compose.foundation.layout.Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(
+                            net.isora.vpn.compose.screen.isora.ui.theme.BgDisconnectedTop,
+                            net.isora.vpn.compose.screen.isora.ui.theme.BgDisconnectedMid,
+                            net.isora.vpn.compose.screen.isora.ui.theme.BgDisconnectedBot,
+                        )
+                    )
+                )
+                .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.statusBars)
+                .padding(horizontal = 20.dp),
+        ) {
+            androidx.compose.material3.Text(
+                text = "Аккаунт",
+                fontFamily = net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontSize = 24.sp,
+                color = net.isora.vpn.compose.screen.isora.ui.theme.Ink,
+                modifier = Modifier.padding(vertical = 14.dp),
+            )
+            IsoraLoginCard(onLoggedIn = onLoggedIn)
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(12.dp))
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(14.dp))
+                    .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.05f))
+                    .border(
+                        1.dp,
+                        androidx.compose.ui.graphics.Color.White.copy(alpha = 0.12f),
+                        androidx.compose.foundation.shape.RoundedCornerShape(14.dp)
+                    )
+                    .clickable(
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                        indication = androidx.compose.material3.ripple(
+                            color = net.isora.vpn.compose.screen.isora.ui.theme.InkDim
+                        ),
+                        onClick = onManageSubscription
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.Text(
+                    text = "Вставить ссылку вручную",
+                    fontFamily = net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.5.sp,
+                    color = net.isora.vpn.compose.screen.isora.ui.theme.Ink
+                )
+            }
+        }
+        return
+    }
     val groups = groupsViewModel?.uiState?.collectAsState()?.value
     val selTag = groups?.groups?.find { it.tag == ISORA_SELECTOR_TAG }?.selected
     val profileName = dash.selectedProfileName ?: "ISORA"
@@ -135,6 +225,12 @@ fun IsoraAccountRoute(
             Status.Stopped -> "Отключено"
         }
     val status2 = if (selTag != null) "Сервер: $selTag" else "Профиль: $profileName"
+    val protocolName = when {
+        selTag == null -> "Авто"
+        selTag.contains("Game") -> "Game · Hysteria2"
+        selTag.contains("Авто") -> "Авто · умный выбор"
+        else -> selTag
+    }
     AccountScreen(
         userEmail = profileName,
         planTitle = "ISORA VPN",
@@ -142,6 +238,8 @@ fun IsoraAccountRoute(
         statusLine1 = status1,
         statusLine2 = status2,
         versionBadge = "",
+        protocolName = protocolName,
         onManageSubscription = onManageSubscription,
+        onOpenServers = onOpenServers,
     )
 }

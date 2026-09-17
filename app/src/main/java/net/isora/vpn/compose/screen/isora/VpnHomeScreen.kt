@@ -97,7 +97,9 @@ fun VpnHomeScreen(
     currentServer: net.isora.vpn.compose.screen.isora.data.VpnServer,
     onToggleConnection: () -> Unit,
     onOpenServers: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    upText: String = "—",
+    downText: String = "—"
 ) {
     val isConnected = state == ConnectionState.Connected
     val isConnecting = state == ConnectionState.Connecting
@@ -238,7 +240,9 @@ fun VpnHomeScreen(
                 state = state,
                 server = currentServer,
                 onClick = onOpenServers,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
+                upText = upText,
+                downText = downText
             )
 
             // Disconnect Button (Only in Connected state!)
@@ -542,7 +546,9 @@ fun ServerCard(
     state: ConnectionState,
     server: net.isora.vpn.compose.screen.isora.data.VpnServer,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    upText: String = "—",
+    downText: String = "—"
 ) {
     val isConnected = state == ConnectionState.Connected
 
@@ -657,7 +663,7 @@ fun ServerCard(
 
                         StatItem(
                             label = "Скачать",
-                            value = "—",
+                            value = downText,
                             icon = IsoraIcons.ArrowDown
                         )
 
@@ -665,7 +671,7 @@ fun ServerCard(
 
                         StatItem(
                             label = "Загрузить",
-                            value = "—",
+                            value = upText,
                             icon = IsoraIcons.ArrowUp
                         )
                     }

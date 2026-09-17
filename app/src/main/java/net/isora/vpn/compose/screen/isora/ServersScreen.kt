@@ -409,20 +409,22 @@ fun ServerRowItem(
                 modifier = Modifier.padding(end = 12.dp)
             ) {
                 Text(
-                    text = "${server.pingMs} ms",
+                    text = if (server.pingMs > 0) "${server.pingMs} ms" else "—",
                     fontFamily = ManropeFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.5.sp,
                     color = when {
+                        server.pingMs <= 0 -> InkFaint
                         server.pingMs < 45 -> AccentGreen
                         server.pingMs < 90 -> Color(0xFFFFB84D)
                         else -> InkDim
-                    }
+                    },
+                    maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${server.loadPercent}%",
+                        text = if (server.loadPercent > 0) "${server.loadPercent}%" else "—",
                         fontFamily = ManropeFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 10.5.sp,

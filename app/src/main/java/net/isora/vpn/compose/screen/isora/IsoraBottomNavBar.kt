@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -91,7 +92,7 @@ fun IsoraBottomNavBar(
 }
 
 @Composable
-private fun NavBarTabItem(
+internal fun NavBarTabItem(
     tab: ScreenTab,
     icon: ImageVector,
     isSelected: Boolean,
@@ -160,6 +161,42 @@ private fun NavBarTabItem(
             fontWeight = FontWeight.Bold,
             fontSize = 10.sp,
             color = textColor
+        )
+    }
+}
+
+/** Вертикальная версия для планшетов/альбома вместо стокового NavigationRail. */
+@Composable
+fun IsoraNavRail(
+    currentTab: ScreenTab,
+    onTabSelected: (ScreenTab) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .background(Color(0xFF06080F).copy(alpha = 0.92f))
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
+    ) {
+        NavBarTabItem(
+            tab = ScreenTab.Home,
+            icon = IsoraIcons.Home,
+            isSelected = currentTab == ScreenTab.Home,
+            onClick = { onTabSelected(ScreenTab.Home) }
+        )
+        NavBarTabItem(
+            tab = ScreenTab.Servers,
+            icon = IsoraIcons.Servers,
+            isSelected = currentTab == ScreenTab.Servers,
+            onClick = { onTabSelected(ScreenTab.Servers) }
+        )
+        NavBarTabItem(
+            tab = ScreenTab.Account,
+            icon = IsoraIcons.User,
+            isSelected = currentTab == ScreenTab.Account,
+            onClick = { onTabSelected(ScreenTab.Account) }
         )
     }
 }

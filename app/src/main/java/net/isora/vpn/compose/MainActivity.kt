@@ -128,6 +128,7 @@ import net.isora.vpn.compose.screen.dashboard.GroupsCard
 import net.isora.vpn.compose.screen.dashboard.groups.GroupsViewModel
 import net.isora.vpn.compose.screen.isora.data.ScreenTab
 import net.isora.vpn.compose.screen.isora.ui.components.IsoraBottomNavBar
+import net.isora.vpn.compose.screen.isora.ui.components.IsoraNavRail
 import net.isora.vpn.compose.screen.log.LogViewModel
 import net.isora.vpn.compose.screen.tools.OpenConnectStatusViewModel
 import net.isora.vpn.compose.screen.tools.OpenVPNStatusViewModel
@@ -832,6 +833,8 @@ class MainActivity :
         val isLogRoute = currentRootRoute == Screen.Log.route
         val isServersRoute = currentRootRoute == Screen.Servers.route
         val isAccountRoute = currentRootRoute == Screen.Account.route
+        // Группы нужны и на Главной (текущий сервер + пинги), иначе там вечное «Авто».
+        val isHomeRoute = currentRootRoute == Screen.Home.route
 
         val isSubScreen = isSettingsSubScreen || isToolsSubScreen || isConnectionsDetail || isProfileRoute
         // Get LogViewModel instance if we're on the Log screen
@@ -843,7 +846,7 @@ class MainActivity :
             }
 
         val groupsViewModel: GroupsViewModel? =
-            if (isGroupsRoute || isServersRoute || isAccountRoute) {
+            if (isGroupsRoute || isServersRoute || isAccountRoute || isHomeRoute) {
                 viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -1242,47 +1245,31 @@ class MainActivity :
         CompositionLocalProvider(LocalTopBarController provides topBarController) {
             if (useNavigationRail) {
                 Row(modifier = Modifier.fillMaxSize()) {
-                    Surface(tonalElevation = 1.dp) {
-                        NavigationRail(
-                            modifier = Modifier.fillMaxHeight(),
-                        ) {
-                            val hasUpdate by UpdateState.hasUpdate
-                            railScreens.forEach { screen ->
-                                val selected = currentRootRoute == screen.route
-
-                                NavigationRailItem(
-                                    icon = {
-                                        if (screen == Screen.Settings && hasUpdate) {
-                                            BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.primary) }) {
-                                                Icon(screen.icon, contentDescription = null)
-                                            }
-                                        } else if (screen == Screen.Tools && taildropFailedCount > 0) {
-                                            BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.error) { Text("!") } }) {
-                                                Icon(screen.icon, contentDescription = null)
-                                            }
-                                        } else if (screen == Screen.Tools && toolsUnreadCount > 0) {
-                                            BadgedBox(badge = { Badge(containerColor = MaterialTheme.colorScheme.error) { Text("$toolsUnreadCount") } }) {
-                                                Icon(screen.icon, contentDescription = null)
-                                            }
-                                        } else {
-                                            Icon(screen.icon, contentDescription = null)
-                                        }
-                                    },
-                                    label = { Text(stringResource(screen.titleRes)) },
-                                    selected = selected,
-                                    onClick = {
-                                        navController.navigate(screen.route) {
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                    },
-                                )
-                            }
+                    // Наша вертикальная панель вместо стокового NavigationRail.
+                    val railTab =
+                        when (currentRootRoute) {
+                            Screen.Servers.route -> ScreenTab.Servers
+                            Screen.Account.route -> ScreenTab.Account
+                            else -> ScreenTab.Home
                         }
-                    }
+                    IsoraNavRail(
+                        currentTab = railTab,
+                        onTabSelected = { tab ->
+                            val route =
+                                when (tab) {
+                                    ScreenTab.Servers -> Screen.Servers.route
+                                    ScreenTab.Account -> Screen.Account.route
+                                    ScreenTab.Home -> Screen.Home.route
+                                }
+                            navController.navigate(route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    )
 
                     Scaffold(
                         modifier = Modifier

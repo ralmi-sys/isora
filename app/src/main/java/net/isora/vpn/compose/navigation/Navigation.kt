@@ -143,6 +143,7 @@ fun NavHost(
             Box(modifier = Modifier.fillMaxSize().padding(bottom = scaffoldBottom)) {
                 IsoraServersRoute(
                     groupsViewModel = groupsViewModel,
+                    serviceStatus = serviceStatus,
                     onSelectDone = { navController.navigate(Screen.Home.route) },
                 )
             }
@@ -157,6 +158,8 @@ fun NavHost(
                         groupsViewModel = groupsViewModel,
                         serviceStatus = serviceStatus,
                         onManageSubscription = { onOpenNewProfile(NewProfileArgs()) },
+                        onLoggedIn = { navController.navigate(Screen.Home.route) },
+                        onOpenServers = { navController.navigate(Screen.Servers.route) },
                     )
                 }
             }

@@ -1,6 +1,5 @@
 package net.isora.vpn.compose.screen.isora.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,10 +29,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.isora.vpn.compose.screen.isora.data.VpnProtocol
 import net.isora.vpn.compose.screen.isora.ui.components.IsoraIcons
 import net.isora.vpn.compose.screen.isora.ui.theme.AccentGreen
 import net.isora.vpn.compose.screen.isora.ui.theme.BgDisconnectedBot
@@ -66,14 +61,11 @@ fun AccountScreen(
     statusLine1: String = "",
     statusLine2: String = "",
     versionBadge: String = "",
+    protocolName: String = "Авто",
     onManageSubscription: () -> Unit = {},
+    onOpenServers: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var killSwitchEnabled by remember { mutableStateOf(true) }
-    var autoConnectEnabled by remember { mutableStateOf(false) }
-    var dnsShieldEnabled by remember { mutableStateOf(true) }
-    var currentProtocol by remember { mutableStateOf(VpnProtocol.Auto) }
-    var showProtocolPicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Box(
@@ -174,96 +166,29 @@ fun AccountScreen(
                             .background(Color.White.copy(alpha = 0.045f))
                             .border(1.dp, Color.White.copy(alpha = 0.09f), RoundedCornerShape(18.dp))
                     ) {
-                        // Kill switch
-                        SettingsToggleRow(
-                            title = "Kill Switch",
-                            subtitle = "Блокировать трафик при случайном разрыве VPN",
-                            icon = IsoraIcons.Shield,
-                            checked = killSwitchEnabled,
-                            onCheckedChange = { killSwitchEnabled = it }
-                        )
-
-                        SettingsDivider()
-
-                        // DNS Shield
-                        SettingsToggleRow(
-                            title = "DNS Shield & Антитрекер",
-                            subtitle = "Блокировка рекламы, вредоносных сайтов и фишинга",
-                            icon = IsoraIcons.Lock,
-                            checked = dnsShieldEnabled,
-                            onCheckedChange = { dnsShieldEnabled = it }
-                        )
-
-                        SettingsDivider()
-
-                        // Auto-connect
-                        SettingsToggleRow(
-                            title = "Автоподключение",
-                            subtitle = "Защищать трафик в публичных и неизвестных Wi-Fi",
-                            icon = IsoraIcons.Zap,
-                            checked = autoConnectEnabled,
-                            onCheckedChange = { autoConnectEnabled = it }
-                        )
-
-                        SettingsDivider()
-
-                        // Protocol selector
+                        // Kill Switch — системный: открывается экран настроек Android.
                         SettingsClickableRow(
-                            title = "Протокол шифрования",
-                            subtitle = currentProtocol.displayName,
-                            icon = IsoraIcons.Servers,
-                            onClick = { showProtocolPicker = !showProtocolPicker }
-                        )
-
-                        AnimatedVisibility(visible = showProtocolPicker) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color(0xFF0C1226).copy(alpha = 0.85f))
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                            ) {
-                                VpnProtocol.entries.forEach { proto ->
-                                    val isSelected = proto == currentProtocol
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .clickable {
-                                                currentProtocol = proto
-                                                showProtocolPicker = false
-                                            }
-                                            .padding(vertical = 10.dp, horizontal = 10.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = proto.displayName,
-                                                fontFamily = ManropeFontFamily,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 13.5.sp,
-                                                color = if (isSelected) Color(0xFF609BFF) else Ink
-                                            )
-                                            Text(
-                                                text = proto.description,
-                                                fontFamily = ManropeFontFamily,
-                                                fontWeight = FontWeight.Normal,
-                                                fontSize = 11.5.sp,
-                                                color = InkDim
-                                            )
-                                        }
-                                        if (isSelected) {
-                                            Icon(
-                                                imageVector = IsoraIcons.Check,
-                                                contentDescription = "Selected",
-                                                tint = Color(0xFF609BFF),
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                        }
-                                    }
+                            title = "Kill Switch",
+                            subtitle = "Блокировка без VPN — включается в настройках Android",
+                            icon = IsoraIcons.Shield,
+                            onClick = {
+                                runCatching {
+                                    context.startActivity(
+                                        android.content.Intent(android.provider.Settings.ACTION_VPN_SETTINGS)
+                                    )
                                 }
                             }
-                        }
+                        )
+
+                        SettingsDivider()
+
+                        // Протокол — показывает текущий, меняется во вкладке Серверы.
+                        SettingsClickableRow(
+                            title = "Протокол",
+                            subtitle = protocolName,
+                            icon = IsoraIcons.Servers,
+                            onClick = onOpenServers
+                        )
                     }
                 }
 
@@ -299,7 +224,16 @@ fun AccountScreen(
                             title = "Политика без логов (No-Logs)",
                             subtitle = "Подтверждено независимым аудитом 2026",
                             icon = IsoraIcons.Shield,
-                            onClick = {}
+                            onClick = {
+                                runCatching {
+                                    context.startActivity(
+                                        android.content.Intent(
+                                            android.content.Intent.ACTION_VIEW,
+                                            android.net.Uri.parse("https://t.me/Isora_Official")
+                                        )
+                                    )
+                                }
+                            }
                         )
                     }
                 }
