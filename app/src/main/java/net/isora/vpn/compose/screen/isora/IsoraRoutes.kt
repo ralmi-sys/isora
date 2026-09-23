@@ -37,10 +37,46 @@ import net.isora.vpn.constant.Status
 
 const val ISORA_SELECTOR_TAG = "ISORA"
 
+private const val ISORA_PREFS = "isora_ui"
+private const val KEY_PENDING_SERVER = "pending_server"
+private const val KEY_MANUAL_AT = "manual_select_at"
+private const val KEY_AUTO_AT = "autoswitch_at"
+private const val KEY_FAILS = "fail_streak"
+private const val KEY_FAIL_AT = "fail_last_at"
+
+/** Курированный список приложения (владелец, 23.09): только живое. */
+fun isCuratedTag(tag: String): Boolean =
+    tag.contains("Авто") || tag.contains("Без рекламы") ||
+        tag.contains("DE") || tag.contains("SE") ||
+        tag == "🇳🇱 NL-Game"
+
+fun savePendingServer(context: android.content.Context, tag: String) {
+    context.getSharedPreferences(ISORA_PREFS, android.content.Context.MODE_PRIVATE)
+        .edit().putString(KEY_PENDING_SERVER, tag).apply()
+}
+
+fun peekPendingServer(context: android.content.Context): String? {
+    return context.getSharedPreferences(ISORA_PREFS, android.content.Context.MODE_PRIVATE)
+        .getString(KEY_PENDING_SERVER, null)
+}
+
+fun takePendingServer(context: android.content.Context): String? {
+    val prefs = context.getSharedPreferences(ISORA_PREFS, android.content.Context.MODE_PRIVATE)
+    val tag = prefs.getString(KEY_PENDING_SERVER, null)
+    if (tag != null) prefs.edit().remove(KEY_PENDING_SERVER).apply()
+    return tag
+}
+
+fun saveManualAt(context: android.content.Context) {
+    context.getSharedPreferences(ISORA_PREFS, android.content.Context.MODE_PRIVATE)
+        .edit().putLong(KEY_MANUAL_AT, System.currentTimeMillis()).apply()
+}
+
 /** Маппинг тега outbound из подписки (/api/singbox) в карточку сервера. */
 fun serverForTag(tag: String, pingMs: Int): VpnServer {
     val (country, city, code) = when {
         tag.contains("Авто") -> Triple("Авто", "Умный выбор", CountryCode.EU)
+        tag.contains("Без рекламы") -> Triple("Без рекламы", "Без трекеров", CountryCode.EU)
         tag.contains("NL-Game") -> Triple("Нидерланды", "Amsterdam · Game", CountryCode.NL)
         tag.contains("NL") -> Triple("Нидерланды", "Amsterdam", CountryCode.NL)
         tag.contains("FI-Game") -> Triple("Финляндия", "Helsinki · Game", CountryCode.FI)
@@ -99,6 +135,66 @@ fun IsoraHomeRoute(
         }
     }
 
+    // Отложенный выбор: тап без коннекта запоминаем, применяем на старте.
+    // pending съедаем ТОЛЬКО в момент применения: селектор после коннекта
+    // подгружается асинхронно, иначе первое срабатывание (selector=null)
+    // молча глотало выбор (баг сборки-10, пойман живьём в Waydroid 23.09).
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(serviceStatus, selTag, selector?.items?.size) {
+        if (serviceStatus == Status.Started) {
+            val pending = peekPendingServer(context)
+            if (pending != null && selTag != pending &&
+                selector?.items?.any { it.tag == pending } == true
+            ) {
+                takePendingServer(context)
+                groupsViewModel?.selectGroupItem(ISORA_SELECTOR_TAG, pending)
+                groupsViewModel?.sendGlobalEvent(
+                    net.isora.vpn.compose.base.UiEvent.ToastMessage("Включил: $pending")
+                )
+            }
+        }
+    }
+
+    // Честные глаза: живые пинги селектора — Дозору (троттлинг внутри, 10 мин).
+    LaunchedEffect(serviceStatus, selector?.items) {
+        if (serviceStatus == Status.Started) {
+            val items = selector?.items ?: return@LaunchedEffect
+            PingReporter.maybeReport(context, items.associate { it.tag to it.urlTestDelay })
+        }
+    }
+
+    // Автодобивка: текущий умер (3 замера подряд null с шагом ≥150с),
+    // живой кандидат есть — перекидываем сами. Не чаще раза в 30 мин,
+    // свежий ручной выбор первые 5 мин не трогаем.
+    LaunchedEffect(serviceStatus, selector?.items) {
+        if (serviceStatus != Status.Started) return@LaunchedEffect
+        val items = selector?.items ?: return@LaunchedEffect
+        val prefs = context.getSharedPreferences(ISORA_PREFS, android.content.Context.MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        if (now - prefs.getLong(KEY_MANUAL_AT, 0) < 5 * 60 * 1000L) return@LaunchedEffect
+        if (now - prefs.getLong(KEY_AUTO_AT, 0) < 30 * 60 * 1000L) return@LaunchedEffect
+        val cur = selTag ?: return@LaunchedEffect
+        val delays = items.filter { isCuratedTag(it.tag) }.associate { it.tag to it.urlTestDelay }
+        if ((delays[cur] ?: 0) > 0) {
+            prefs.edit().putInt(KEY_FAILS, 0).apply()
+            return@LaunchedEffect
+        }
+        val best = delays.filter { it.key != cur && it.value > 0 }.minByOrNull { it.value }
+            ?: return@LaunchedEffect
+        if (now - prefs.getLong(KEY_FAIL_AT, 0) < 150 * 1000L) return@LaunchedEffect
+        val streak = prefs.getInt(KEY_FAILS, 0) + 1
+        prefs.edit().putInt(KEY_FAILS, streak).putLong(KEY_FAIL_AT, now).apply()
+        if (streak >= 3) {
+            prefs.edit().putInt(KEY_FAILS, 0).putLong(KEY_AUTO_AT, now)
+                .putLong(KEY_MANUAL_AT, now).apply()
+            groupsViewModel?.selectGroupItem(ISORA_SELECTOR_TAG, best.key)
+            val name = serverForTag(best.key, best.value).country
+            groupsViewModel?.sendGlobalEvent(
+                net.isora.vpn.compose.base.UiEvent.ToastMessage("$cur умер, включил: $name")
+            )
+        }
+    }
+
     VpnHomeScreen(
         state = serviceStatus.toConnectionState(),
         currentServer = current,
@@ -134,26 +230,33 @@ fun IsoraServersRoute(
         if (selector != null) {
             // В селекторе бывают дубли (NL-Game идёт и первым, и в tags) —
             // без distinctBy LazyColumn падает с duplicate key.
-            selector.items.distinctBy { it.tag }.map { serverForTag(it.tag, it.urlTestDelay.takeIf { d -> d > 0 } ?: 0) }
+            // Курированный список: только живое (Авто, Без рекламы, DE, SE, NL-Game).
+            val items = selector.items.distinctBy { it.tag }.filter { isCuratedTag(it.tag) }
+            if (items.isNotEmpty()) {
+                items.map { serverForTag(it.tag, it.urlTestDelay.takeIf { d -> d > 0 } ?: 0) }
+            } else {
+                DefaultServers.list
+            }
         } else {
             DefaultServers.list
         }
     val current =
         selector?.selected?.let { serverForTag(it, 0) } ?: servers.first()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     ServersScreen(
         currentServer = current,
         servers = servers,
         onSelectServer = { s ->
-            if (selector != null) {
+            saveManualAt(context)
+            if (selector != null && isCuratedTag(s.id)) {
                 groupsViewModel?.selectGroupItem(selector.tag, s.id)
             } else {
-                // VPN выключен: командный канал мёртв, выбор фейкового
-                // DefaultServers никуда не уйдёт — говорим прямо вместо
-                // тихого игнора (жалоба «не выбирается» на 742).
+                // VPN выключен: выбор запоминаем, применится сам на коннекте.
+                savePendingServer(context, s.id)
                 groupsViewModel?.sendGlobalEvent(
-                    net.isora.vpn.compose.base.UiEvent.ErrorMessage(
-                        "Сначала включите VPN — сервер выбирается на коннекте"
+                    net.isora.vpn.compose.base.UiEvent.ToastMessage(
+                        "Запомнил: ${s.country}. Включу при подключении"
                     )
                 )
             }

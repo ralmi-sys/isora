@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 sealed class UiEvent {
     data class ErrorMessage(val message: String) : UiEvent()
 
+    /** Короткий тост (подтверждения типа «запомнил выбор») — без диалога. */
+    data class ToastMessage(val message: String) : UiEvent()
+
     data class OpenUrl(val url: String) : UiEvent()
 
     data class EditProfile(val profileId: Long) : UiEvent()

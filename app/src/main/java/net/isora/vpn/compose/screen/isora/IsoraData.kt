@@ -27,9 +27,12 @@ enum class VpnProtocol(val displayName: String, val description: String) {
 }
 
 object DefaultServers {
+    // Заглушки БЕЗ подписки/коннекта: id = НАСТОЯЩИЕ теги выдачи,
+    // чтобы тап офлайн сохранялся как отложенный выбор (isCuratedTag их пропускает).
+    // Пинги/нагрузка нули — рендерятся прочерком, не врём.
     val list = listOf(
         VpnServer(
-            id = "auto",
+            id = "🇪🇺 Авто",
             country = "Авто",
             city = "Умный выбор",
             pingMs = 0,
@@ -39,18 +42,7 @@ object DefaultServers {
             isFast = true
         ),
         VpnServer(
-            id = "nl_ams_01",
-            country = "Нидерланды",
-            city = "Amsterdam",
-            pingMs = 0,
-            countryCode = CountryCode.NL,
-            loadPercent = 0,
-            isRecommended = true,
-            isFast = true,
-            isStreaming = true
-        ),
-        VpnServer(
-            id = "de_fra_01",
+            id = "🇩🇪 DE",
             country = "Германия",
             city = "Frankfurt",
             pingMs = 0,
@@ -60,21 +52,43 @@ object DefaultServers {
             isFast = true
         ),
         VpnServer(
-            id = "fi_hel_01",
-            country = "Финляндия",
-            city = "Helsinki",
+            id = "🇩🇪 DE-Game",
+            country = "Германия",
+            city = "Frankfurt · Game",
             pingMs = 0,
-            countryCode = CountryCode.FI,
+            countryCode = CountryCode.DE,
             loadPercent = 0,
             isFast = true
         ),
         VpnServer(
-            id = "fr_par_01",
-            country = "Франция",
-            city = "Paris",
+            id = "🇸🇪 SE",
+            country = "Швеция",
+            city = "Stockholm",
             pingMs = 0,
-            countryCode = CountryCode.FR,
-            loadPercent = 0
+            countryCode = CountryCode.SE,
+            loadPercent = 0,
+            isRecommended = true,
+            isFast = true
+        ),
+        VpnServer(
+            id = "🇸🇪 SE-Game",
+            country = "Швеция",
+            city = "Stockholm · Game",
+            pingMs = 0,
+            countryCode = CountryCode.SE,
+            loadPercent = 0,
+            isFast = true
+        ),
+        VpnServer(
+            id = "🇳🇱 NL-Game",
+            country = "Нидерланды",
+            city = "Amsterdam · Game",
+            pingMs = 0,
+            countryCode = CountryCode.NL,
+            loadPercent = 0,
+            isRecommended = true,
+            isFast = true,
+            isStreaming = true
         )
     )
 }

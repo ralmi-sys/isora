@@ -56,8 +56,6 @@ class IsoraLoginViewModel(application: Application) : AndroidViewModel(applicati
                 val url = subUrl ?: throw Exception("Время вышло — нажми ещё раз")
                 importSubscription(url)
                 _uiState.update { it.copy(phase = Phase.Done) }
-                importSubscription(url)
-                _uiState.update { it.copy(phase = Phase.Done) }
             } catch (e: Exception) {
                 if (e is kotlinx.coroutines.CancellationException) throw e
                 _uiState.update { it.copy(phase = Phase.Error, error = e.message ?: "Не вышло") }

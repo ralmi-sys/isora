@@ -986,6 +986,12 @@ class MainActivity :
                         showErrorDialog = true
                     }
 
+                    is UiEvent.ToastMessage -> {
+                        android.widget.Toast.makeText(
+                            this@MainActivity, event.message, android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                     is UiEvent.OpenUrl -> {
                         this@MainActivity.launchCustomTab(event.url)
                     }
