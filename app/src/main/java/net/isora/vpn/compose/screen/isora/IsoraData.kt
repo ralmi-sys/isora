@@ -42,9 +42,9 @@ object DefaultServers {
             id = "nl_ams_01",
             country = "Нидерланды",
             city = "Amsterdam",
-            pingMs = 24,
+            pingMs = 0,
             countryCode = CountryCode.NL,
-            loadPercent = 34,
+            loadPercent = 0,
             isRecommended = true,
             isFast = true,
             isStreaming = true
@@ -53,9 +53,9 @@ object DefaultServers {
             id = "de_fra_01",
             country = "Германия",
             city = "Frankfurt",
-            pingMs = 28,
+            pingMs = 0,
             countryCode = CountryCode.DE,
-            loadPercent = 42,
+            loadPercent = 0,
             isRecommended = true,
             isFast = true
         ),
@@ -63,18 +63,18 @@ object DefaultServers {
             id = "fi_hel_01",
             country = "Финляндия",
             city = "Helsinki",
-            pingMs = 35,
+            pingMs = 0,
             countryCode = CountryCode.FI,
-            loadPercent = 40,
+            loadPercent = 0,
             isFast = true
         ),
         VpnServer(
             id = "fr_par_01",
             country = "Франция",
             city = "Paris",
-            pingMs = 60,
+            pingMs = 0,
             countryCode = CountryCode.FR,
-            loadPercent = 70
+            loadPercent = 0
         )
     )
 }

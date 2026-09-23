@@ -61,6 +61,7 @@ import net.isora.vpn.compose.screen.isora.ui.theme.BgGlowDisconnected
 import net.isora.vpn.compose.screen.isora.ui.theme.Ink
 import net.isora.vpn.compose.screen.isora.ui.theme.InkDim
 import net.isora.vpn.compose.screen.isora.ui.theme.InkFaint
+import net.isora.vpn.compose.screen.isora.ui.theme.HeadFontFamily
 import net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily
 
 @Composable
@@ -83,7 +84,7 @@ fun ServersScreen(
 
             val matchesFilter = when (selectedFilter) {
                 "Рекомендуемые" -> server.isRecommended
-                "Быстрые" -> server.isFast || server.pingMs < 40
+                "Быстрые" -> server.isFast || (server.pingMs > 0 && server.pingMs < 40)
                 "Стриминг" -> server.isStreaming
                 else -> true
             }
@@ -132,8 +133,8 @@ fun ServersScreen(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Серверы",
-                        fontFamily = ManropeFontFamily,
-                        fontWeight = FontWeight.Bold,
+                        fontFamily = HeadFontFamily,
+                        fontWeight = FontWeight.SemiBold,
                         fontSize = 24.sp,
                         color = Ink,
                         letterSpacing = 0.5.sp,
@@ -438,6 +439,7 @@ fun ServerRowItem(
                             .clip(CircleShape)
                             .background(
                                 when {
+                                    server.loadPercent <= 0 -> InkFaint
                                     server.loadPercent < 50 -> AccentGreen
                                     server.loadPercent < 75 -> Color(0xFFFFB84D)
                                     else -> Color(0xFFFF5252)

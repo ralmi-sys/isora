@@ -16,6 +16,18 @@ val ManropeFontFamily = FontFamily(
     Font(R.font.manrope, FontWeight.ExtraBold)
 )
 
+// Сайт ISORA (v5): Michroma — витринный wordmark (латиница), Unbounded — русские заголовки.
+val WordmarkFontFamily = FontFamily(
+    Font(R.font.michroma, FontWeight.Normal)
+)
+
+val HeadFontFamily = FontFamily(
+    Font(R.font.unbounded, FontWeight.Normal),
+    Font(R.font.unbounded, FontWeight.Medium),
+    Font(R.font.unbounded, FontWeight.SemiBold),
+    Font(R.font.unbounded, FontWeight.Bold)
+)
+
 val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = ManropeFontFamily,

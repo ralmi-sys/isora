@@ -51,6 +51,7 @@ import net.isora.vpn.compose.screen.isora.ui.theme.BgGlowDisconnected
 import net.isora.vpn.compose.screen.isora.ui.theme.Ink
 import net.isora.vpn.compose.screen.isora.ui.theme.InkDim
 import net.isora.vpn.compose.screen.isora.ui.theme.InkFaint
+import net.isora.vpn.compose.screen.isora.ui.theme.HeadFontFamily
 import net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily
 
 @Composable
@@ -107,8 +108,8 @@ fun AccountScreen(
             ) {
                 Text(
                     text = "Аккаунт",
-                    fontFamily = ManropeFontFamily,
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = HeadFontFamily,
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = 24.sp,
                     color = Ink,
                     letterSpacing = 0.5.sp

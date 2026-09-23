@@ -1068,7 +1068,9 @@ class MainActivity :
                             )
                         } else {
                             ServiceStatusBar(
-                                visible = showStatusBar && !isSubScreen,
+                                // На экранах Isora свои индикаторы — стоковую полосу прячем,
+                                // иначе она лежит поверх нашего дизайна (жалоба 23.09).
+                                visible = showStatusBar && !isSubScreen && !isHomeRoute && !isServersRoute && !isAccountRoute,
                                 serviceStatus = currentServiceStatus,
                                 startTime = dashboardUiState.serviceStartTime,
                                 groupsCount = dashboardUiState.groupsCount,

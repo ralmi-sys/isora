@@ -76,6 +76,7 @@ import net.isora.vpn.compose.screen.isora.ui.theme.Ink
 import net.isora.vpn.compose.screen.isora.ui.theme.InkDim
 import net.isora.vpn.compose.screen.isora.ui.theme.InkFaint
 import net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily
+import net.isora.vpn.compose.screen.isora.ui.theme.WordmarkFontFamily
 import net.isora.vpn.compose.screen.isora.ui.theme.OrbConnectedCore
 import net.isora.vpn.compose.screen.isora.ui.theme.OrbConnectedEdge
 import net.isora.vpn.compose.screen.isora.ui.theme.OrbConnectedGlowInner
@@ -204,9 +205,10 @@ fun VpnHomeScreen(
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.statusBars)
         ) {
-            // TopBar
+            // TopBar (top 26dp: системные инсеты съедены выше по дереву,
+            // поэтому фиксированный отступ — иначе wordmark лезет на часы).
             TopBar(
-                modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 26.dp, bottom = 8.dp),
                 onPowerClick = onToggleConnection
             )
 
@@ -270,17 +272,19 @@ fun TopBar(
     onPowerClick: () -> Unit
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.statusBars),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "ISORA",
-            fontFamily = ManropeFontFamily,
-            fontWeight = FontWeight.Bold,
+            fontFamily = WordmarkFontFamily,
+            fontWeight = FontWeight.Normal,
             fontSize = 20.sp,
             color = Ink,
-            letterSpacing = 4.sp
+            letterSpacing = 5.sp
         )
 
         Box(
@@ -655,7 +659,7 @@ fun ServerCard(
                     ) {
                         StatItem(
                             label = "Пинг",
-                            value = "${server.pingMs} ms",
+                            value = if (server.pingMs > 0) "${server.pingMs} ms" else "—",
                             icon = null
                         )
 

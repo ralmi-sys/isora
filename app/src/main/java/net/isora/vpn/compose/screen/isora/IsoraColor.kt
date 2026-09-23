@@ -11,6 +11,12 @@ val CardBorder = Color(0xFFFFFFFF).copy(alpha = 0.10f)
 
 val AccentGreen = Color(0xFF3FE0A5)
 
+// Сайт ISORA (v5): синий Apple-акцент для кнопок/выбора, зелень — только статусы.
+val SiteBlue = Color(0xFF0A84FF)
+val SiteBlueLight = Color(0xFF00C6FF)
+val SiteHint = Color(0xFF98989F)
+val SiteCard = Color(0xFF161821).copy(alpha = 0.72f)
+
 // Orbit disconnected colors
 val OrbDisconnectedCore = Color(0xFFC3E3FF).copy(alpha = 0.95f)
 val OrbDisconnectedMid = Color(0xFF609BFF).copy(alpha = 0.55f)

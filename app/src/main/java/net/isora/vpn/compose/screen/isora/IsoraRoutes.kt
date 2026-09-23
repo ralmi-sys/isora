@@ -45,6 +45,9 @@ fun serverForTag(tag: String, pingMs: Int): VpnServer {
         tag.contains("NL") -> Triple("Нидерланды", "Amsterdam", CountryCode.NL)
         tag.contains("FI-Game") -> Triple("Финляндия", "Helsinki · Game", CountryCode.FI)
         tag.contains("FI") -> Triple("Финляндия", "Helsinki", CountryCode.FI)
+        tag.contains("SE-Game") -> Triple("Швеция", "Stockholm · Game", CountryCode.SE)
+        tag.contains("SE") -> Triple("Швеция", "Stockholm", CountryCode.SE)
+        tag.contains("DE-Game") -> Triple("Германия", "Frankfurt · Game", CountryCode.DE)
         tag.contains("DE") -> Triple("Германия", "Frankfurt", CountryCode.DE)
         tag.contains("FR") -> Triple("Франция", "Paris", CountryCode.FR)
         else -> Triple(tag, "", CountryCode.EU)
@@ -129,7 +132,9 @@ fun IsoraServersRoute(
 
     val servers =
         if (selector != null) {
-            selector.items.map { serverForTag(it.tag, it.urlTestDelay.takeIf { d -> d > 0 } ?: 0) }
+            // В селекторе бывают дубли (NL-Game идёт и первым, и в tags) —
+            // без distinctBy LazyColumn падает с duplicate key.
+            selector.items.distinctBy { it.tag }.map { serverForTag(it.tag, it.urlTestDelay.takeIf { d -> d > 0 } ?: 0) }
         } else {
             DefaultServers.list
         }
@@ -140,7 +145,18 @@ fun IsoraServersRoute(
         currentServer = current,
         servers = servers,
         onSelectServer = { s ->
-            if (selector != null) groupsViewModel?.selectGroupItem(selector.tag, s.id)
+            if (selector != null) {
+                groupsViewModel?.selectGroupItem(selector.tag, s.id)
+            } else {
+                // VPN выключен: командный канал мёртв, выбор фейкового
+                // DefaultServers никуда не уйдёт — говорим прямо вместо
+                // тихого игнора (жалоба «не выбирается» на 742).
+                groupsViewModel?.sendGlobalEvent(
+                    net.isora.vpn.compose.base.UiEvent.ErrorMessage(
+                        "Сначала включите VPN — сервер выбирается на коннекте"
+                    )
+                )
+            }
             onSelectDone()
         },
     )
@@ -175,8 +191,8 @@ fun IsoraAccountRoute(
         ) {
             androidx.compose.material3.Text(
                 text = "Аккаунт",
-                fontFamily = net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontFamily = net.isora.vpn.compose.screen.isora.ui.theme.HeadFontFamily,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
                 fontSize = 24.sp,
                 color = net.isora.vpn.compose.screen.isora.ui.theme.Ink,
                 modifier = Modifier.padding(vertical = 14.dp),

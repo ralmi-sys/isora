@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.isora.vpn.compose.screen.isora.IsoraLoginViewModel
-import net.isora.vpn.compose.screen.isora.ui.theme.AccentGreen
+import net.isora.vpn.compose.screen.isora.ui.theme.SiteBlue
 import net.isora.vpn.compose.screen.isora.ui.theme.Ink
 import net.isora.vpn.compose.screen.isora.ui.theme.InkDim
 import net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily
@@ -102,7 +102,7 @@ fun IsoraLoginCard(
             )
 
             if (state.phase == IsoraLoginViewModel.Phase.Waiting && state.botUrl == null) {
-                CircularProgressIndicator(color = AccentGreen)
+                CircularProgressIndicator(color = SiteBlue)
             }
 
             if (state.phase == IsoraLoginViewModel.Phase.Idle ||
@@ -113,7 +113,7 @@ fun IsoraLoginCard(
                         .fillMaxWidth()
                         .height(52.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(AccentGreen)
+                        .background(SiteBlue)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = ripple(color = Color.White),
@@ -126,7 +126,7 @@ fun IsoraLoginCard(
                         fontFamily = ManropeFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = Color(0xFF05281E)
+                        color = Color.White
                     )
                 }
             }
@@ -137,7 +137,7 @@ fun IsoraLoginCard(
                         .fillMaxWidth()
                         .height(52.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(AccentGreen)
+                        .background(SiteBlue)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = ripple(color = Color.White),
@@ -156,7 +156,7 @@ fun IsoraLoginCard(
                         fontFamily = ManropeFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = Color(0xFF05281E)
+                        color = Color.White
                     )
                 }
                 Box(

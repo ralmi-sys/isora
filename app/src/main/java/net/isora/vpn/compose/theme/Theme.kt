@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -18,8 +19,18 @@ import androidx.core.view.WindowCompat
 private val DarkColorScheme =
     darkColorScheme(
         primary = SingBoxPrimary,
-        secondary = SingBoxPrimaryLight,
+        onPrimary = Color(0xFFFFFFFF),
+        primaryContainer = Color(0xFF0A84FF),
+        onPrimaryContainer = Color(0xFFFFFFFF),
+        secondary = Color(0xFF00C6FF),
+        secondaryContainer = Color(0xFF00344D),
+        onSecondaryContainer = Color(0xFFBFE9FF),
         tertiary = LogBlue,
+        background = Color(0xFF000000),
+        surface = Color(0xFF0B0D14),
+        surfaceVariant = Color(0xFF141824),
+        onBackground = Color(0xFFFFFFFF),
+        onSurface = Color(0xFFFFFFFF),
     )
 
 private val LightColorScheme =

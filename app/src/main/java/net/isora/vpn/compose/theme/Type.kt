@@ -2,8 +2,8 @@ package net.isora.vpn.compose.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import net.isora.vpn.compose.screen.isora.ui.theme.ManropeFontFamily
 import androidx.compose.ui.unit.sp
 
 // Material 3 Typography
@@ -12,7 +12,7 @@ val Typography =
         // Display styles
         displayLarge =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 57.sp,
             lineHeight = 64.sp,
@@ -20,7 +20,7 @@ val Typography =
         ),
         displayMedium =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 45.sp,
             lineHeight = 52.sp,
@@ -28,7 +28,7 @@ val Typography =
         ),
         displaySmall =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 36.sp,
             lineHeight = 44.sp,
@@ -37,7 +37,7 @@ val Typography =
         // Headline styles
         headlineLarge =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 32.sp,
             lineHeight = 40.sp,
@@ -45,7 +45,7 @@ val Typography =
         ),
         headlineMedium =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 28.sp,
             lineHeight = 36.sp,
@@ -53,7 +53,7 @@ val Typography =
         ),
         headlineSmall =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 24.sp,
             lineHeight = 32.sp,
@@ -62,7 +62,7 @@ val Typography =
         // Title styles
         titleLarge =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 22.sp,
             lineHeight = 28.sp,
@@ -70,7 +70,7 @@ val Typography =
         ),
         titleMedium =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp,
             lineHeight = 24.sp,
@@ -78,7 +78,7 @@ val Typography =
         ),
         titleSmall =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             lineHeight = 20.sp,
@@ -87,7 +87,7 @@ val Typography =
         // Body styles
         bodyLarge =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp,
             lineHeight = 24.sp,
@@ -95,7 +95,7 @@ val Typography =
         ),
         bodyMedium =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 14.sp,
             lineHeight = 20.sp,
@@ -103,7 +103,7 @@ val Typography =
         ),
         bodySmall =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 12.sp,
             lineHeight = 16.sp,
@@ -112,7 +112,7 @@ val Typography =
         // Label styles
         labelLarge =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             lineHeight = 20.sp,
@@ -120,7 +120,7 @@ val Typography =
         ),
         labelMedium =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             lineHeight = 16.sp,
@@ -128,7 +128,7 @@ val Typography =
         ),
         labelSmall =
         TextStyle(
-            fontFamily = FontFamily.Default,
+            fontFamily = ManropeFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 11.sp,
             lineHeight = 16.sp,
