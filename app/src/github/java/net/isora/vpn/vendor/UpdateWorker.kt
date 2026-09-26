@@ -81,6 +81,16 @@ class UpdateWorker(private val appContext: Context, params: WorkerParameters) : 
                 Log.d(TAG, "Downloading update...")
                 val apkFile = ApkDownloader().use { it.download(updateInfo.downloadUrl) }
 
+                // Подлинность ДО установки: пакет+подпись всегда, хеш — если есть в метаданных.
+                if (!ApkVerifier.verifyPackage(appContext, apkFile) ||
+                    !ApkVerifier.verifyFileHash(apkFile, updateInfo.sha256)
+                ) {
+                    Log.w(TAG, "Update rejected: authenticity check failed, deleting file")
+                    runCatching { apkFile.delete() }
+                    UpdateState.setUpdate(null)
+                    return Result.failure()
+                }
+
                 Log.d(TAG, "Installing update...")
                 ApkInstaller.install(appContext, apkFile)
                 Log.d(TAG, "Update installed successfully")

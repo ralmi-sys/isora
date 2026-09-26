@@ -30,6 +30,7 @@ import net.isora.vpn.compose.screen.isora.ui.components.CountryCode
 import net.isora.vpn.compose.screen.isora.data.DefaultServers
 import net.isora.vpn.compose.screen.isora.data.VpnServer
 import net.isora.vpn.compose.screen.isora.ui.screens.AccountScreen
+import net.isora.vpn.compose.screen.isora.ui.screens.MirageCard
 import net.isora.vpn.compose.screen.isora.ui.screens.ConnectionState
 import net.isora.vpn.compose.screen.isora.ui.screens.ServersScreen
 import net.isora.vpn.compose.screen.isora.ui.screens.VpnHomeScreen
@@ -46,7 +47,7 @@ private const val KEY_FAIL_AT = "fail_last_at"
 
 /** Курированный список приложения (владелец, 23.09): только живое. */
 fun isCuratedTag(tag: String): Boolean =
-    tag.contains("Авто") || tag.contains("Без рекламы") ||
+    tag.contains("Авто") || tag.contains("Без рекламы") || tag.contains("Mirage") ||
         tag.contains("DE") || tag.contains("SE") ||
         tag == "🇳🇱 NL-Game"
 
@@ -77,6 +78,7 @@ fun serverForTag(tag: String, pingMs: Int): VpnServer {
     val (country, city, code) = when {
         tag.contains("Авто") -> Triple("Авто", "Умный выбор", CountryCode.EU)
         tag.contains("Без рекламы") -> Triple("Без рекламы", "Без трекеров", CountryCode.EU)
+        tag.contains("Mirage") -> Triple("Mirage", "Новая дверь · тест", CountryCode.SE)
         tag.contains("NL-Game") -> Triple("Нидерланды", "Amsterdam · Game", CountryCode.NL)
         tag.contains("NL") -> Triple("Нидерланды", "Amsterdam", CountryCode.NL)
         tag.contains("FI-Game") -> Triple("Финляндия", "Helsinki · Game", CountryCode.FI)
@@ -302,6 +304,8 @@ fun IsoraAccountRoute(
             )
             IsoraLoginCard(onLoggedIn = onLoggedIn)
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(12.dp))
+            MirageCard()
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(12.dp))
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -346,6 +350,7 @@ fun IsoraAccountRoute(
     val status2 = if (selTag != null) "Сервер: $selTag" else "Профиль: $profileName"
     val protocolName = when {
         selTag == null -> "Авто"
+        selTag.contains("Mirage") -> "Mirage · новая дверь"
         selTag.contains("Game") -> "Game · Hysteria2"
         selTag.contains("Авто") -> "Авто · умный выбор"
         else -> selTag

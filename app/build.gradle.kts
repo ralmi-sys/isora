@@ -189,6 +189,11 @@ dependencies {
     "otherImplementation"(files("libs/libbox.aar"))
     "otherLegacyImplementation"(files("libs/libbox-legacy.aar"))
 
+    // mirage (ISORA sidecar, gomobile): все флаворы, тег тот же.
+    "playImplementation"(files("libs/mirage.aar"))
+    "otherImplementation"(files("libs/mirage.aar"))
+    "otherLegacyImplementation"(files("libs/mirage.aar"))
+
     // API level specific versions
     val lifecycleVersion24 = "2.11.0"
     val roomVersion24 = "2.8.4"

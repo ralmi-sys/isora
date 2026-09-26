@@ -31,7 +31,8 @@ class RemoteServer(
         // The stored form: scheme-less for http (default), keeping an explicit https.
         fun normalizeURL(urlString: String): String = urlString.trim().trimEnd('/').replaceFirst(httpPrefix, "")
 
-        // The form passed to libbox: a scheme is required, defaulting to http.
+        // The form passed to libbox: a scheme is required, defaulting to https.
+        // Plain http is rejected (secret would travel in cleartext) — audit 24.09, H-02.
         fun connectURL(urlString: String): String {
             val value = urlString.trim().trimEnd('/')
             if (value.isEmpty()) {
@@ -40,7 +41,7 @@ class RemoteServer(
             if (value.contains(schemePrefix)) {
                 return value
             }
-            return "http://$value"
+            return "https://$value"
         }
 
         fun validateURL(urlString: String): String? {
@@ -55,7 +56,7 @@ class RemoteServer(
                     return null
                 }
             val scheme = uri.scheme?.lowercase()
-            if (scheme != "http" && scheme != "https") {
+            if (scheme != "https") {
                 return null
             }
             if (uri.host.isNullOrEmpty()) {

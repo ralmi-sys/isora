@@ -127,8 +127,8 @@ class ProfileImportHandler(private val context: Context) {
                 }
             }
 
-            // Check if it's a direct URL
-            if (data.startsWith("http://") || data.startsWith("https://")) {
+            // Check if it's a direct URL (https only: profile content carries secrets — audit 24.09, H-02)
+            if (data.startsWith("https://")) {
                 val profileName = extractProfileNameFromUrl(data)
                 return@withContext QRCodeParseResult.RemoteProfile(
                     name = profileName,
@@ -167,8 +167,8 @@ class ProfileImportHandler(private val context: Context) {
                 }
             }
 
-            // Check if it's a URL or direct profile content
-            if (data.startsWith("http://") || data.startsWith("https://")) {
+            // Check if it's a URL or direct profile content (https only — audit 24.09, H-02)
+            if (data.startsWith("https://")) {
                 // Handle remote profile URL
                 val profileName = extractProfileNameFromUrl(data)
                 importRemoteProfile(profileName, data)

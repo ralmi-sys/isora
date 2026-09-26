@@ -30,6 +30,10 @@ object ApkInstaller {
     }
 
     suspend fun install(context: Context, apkFile: File, method: InstallMethod = getConfiguredMethod()) {
+        // Подлинность всегда, любым методом: пакет+подпись (аудит 24.09, P0-03).
+        if (!ApkVerifier.verifyPackage(context, apkFile)) {
+            throw SecurityException("ISORA update rejected: package/signature mismatch")
+        }
         when (method) {
             InstallMethod.ROOT -> RootInstaller.install(apkFile)
             InstallMethod.PACKAGE_INSTALLER -> SystemPackageInstaller.install(context, apkFile)

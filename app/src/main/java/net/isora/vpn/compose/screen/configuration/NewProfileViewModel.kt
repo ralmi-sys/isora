@@ -258,7 +258,7 @@ class NewProfileViewModel(application: Application) : AndroidViewModel(applicati
                                 sourceURL.startsWith("file://") -> {
                                     File(Uri.parse(sourceURL).path!!).readText()
                                 }
-                                sourceURL.startsWith("http://") || sourceURL.startsWith("https://") -> {
+                                sourceURL.startsWith("https://") -> {
                                     HTTPClient().use { it.getString(sourceURL) }
                                 }
                                 else -> throw Exception("Unsupported source: $sourceURL")

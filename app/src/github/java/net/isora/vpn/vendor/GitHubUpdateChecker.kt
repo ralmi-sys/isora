@@ -61,6 +61,7 @@ class GitHubUpdateChecker : Closeable {
             releaseNotes = release.body,
             isPrerelease = release.prerelease,
             fileSize = apkAsset?.size ?: 0,
+            sha256 = metadata.sha256,
         )
     }
 
@@ -142,6 +143,7 @@ class GitHubUpdateChecker : Closeable {
     data class VersionMetadata(
         @SerialName("version_code") val versionCode: Int = 0,
         @SerialName("version_name") val versionName: String = "",
+        @SerialName("sha256") val sha256: String = "",
     )
 
     private data class ReleaseCandidate(

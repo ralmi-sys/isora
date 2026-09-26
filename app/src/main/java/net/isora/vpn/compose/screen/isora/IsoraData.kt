@@ -23,7 +23,8 @@ enum class ScreenTab(val title: String) {
 enum class VpnProtocol(val displayName: String, val description: String) {
     Auto("Авто", "Умный выбор сервера"),
     Xhttp("XHTTP", "Стабильно через TCP"),
-    Game("Game", "Hysteria2 для игр")
+    Game("Game", "Hysteria2 для игр"),
+    Mirage("Mirage", "Новая дверь · тест")
 }
 
 object DefaultServers {

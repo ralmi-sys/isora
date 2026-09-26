@@ -29,7 +29,10 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import net.isora.vpn.compose.screen.isora.ui.components.IsoraIcons
 import net.isora.vpn.compose.screen.isora.ui.theme.AccentGreen
 import net.isora.vpn.compose.screen.isora.ui.theme.BgDisconnectedBot
@@ -157,6 +161,11 @@ fun AccountScreen(
                     PlanHighlightsCard()
                 }
 
+                // Mirage · тест: sidecar + ссылка из Mini App (видна тестерам).
+                item {
+                    MirageCard()
+                }
+
                 // Security Section
                 item {
                     SettingsSectionTitle(title = "БЕЗОПАСНОСТЬ И СЕТЬ")
@@ -265,6 +274,124 @@ fun AccountScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun MirageCard() {
+    val context = LocalContext.current
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var status by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf(
+            if (net.isora.vpn.mirage.MirageManager.getLink(context) == null)
+                "Вставь ссылку из Mini App (Подписка → Mirage · тест)"
+            else if (net.isora.vpn.mirage.MirageManager.running()) "Sidecar запущен · 127.0.0.1:29183"
+            else "Ссылка сохранена · жми Старт"
+        )
+    }
+    var busy by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val running = net.isora.vpn.mirage.MirageManager.running()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color.White.copy(alpha = 0.045f))
+            .border(1.dp, Color.White.copy(alpha = 0.09f), RoundedCornerShape(18.dp))
+            .padding(horizontal = 16.dp, vertical = 13.dp)
+    ) {
+        Text(
+            text = "Mirage · тест",
+            fontFamily = ManropeFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.5.sp,
+            color = Ink,
+            maxLines = 1
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = status,
+            fontFamily = ManropeFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            color = InkDim,
+            maxLines = 2
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(42.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White.copy(alpha = 0.06f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = ripple(color = InkDim),
+                        onClick = {
+                            val cm = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                                as android.content.ClipboardManager
+                            val text = cm.primaryClip?.getItemAt(0)?.text?.toString()?.trim() ?: ""
+                            if (text.startsWith("mirage://")) {
+                                net.isora.vpn.mirage.MirageManager.saveLink(context, text)
+                                status = "Ссылка сохранена · жми Старт"
+                            } else {
+                                status = "В буфере нет mirage:// ссылки"
+                            }
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Из буфера",
+                    fontFamily = ManropeFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = Ink
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(42.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF4074E0).copy(alpha = if (busy) 0.15f else 0.35f))
+                    .clickable(
+                        enabled = !busy,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = ripple(color = InkDim),
+                        onClick = {
+                            busy = true
+                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                try {
+                                    status = if (running) {
+                                        net.isora.vpn.mirage.MirageManager.stop(context)
+                                        "Остановлен"
+                                    } else {
+                                        val err = net.isora.vpn.mirage.MirageManager.start(context)
+                                        if (err.isEmpty()) "Sidecar запущен · 127.0.0.1:29183"
+                                        else err
+                                    }
+                                } finally {
+                                    busy = false
+                                }
+                            }
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (running) "Стоп" else "Старт",
+                    fontFamily = ManropeFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = Ink
+                )
             }
         }
     }

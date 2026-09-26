@@ -14,3 +14,10 @@ local.properties
 /CLAUDE.md
 /.claude/
 /app/release.keystore
+# Секреты и ключи никогда не коммитить (аудит 24.09)
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+.env*
